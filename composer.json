@@ -12,5 +12,12 @@
             "email": "me@jandrabek.cz"
         }
     ],
-    "require": {}
+    "require": {
+        "ezyang/htmlpurifier": "^4.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "DatosCZ\\Transformer\\": "src/"
+        }
+    }
 }
