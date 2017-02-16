@@ -28,6 +28,8 @@ $gearbox->addGear(new RegexSplit('ROZDELENI_VPRAVO', '/proti (žalovan|povinn|(z
 $gearbox->addGear(new RegexSplit('ROZDELENI_VLEVO', '/proti (žalovan|povinn|(zástavnímu )?dlužník(ovi|u))[^\\s]*?\s/', RegexSplit::LEFT));
 $gearbox->addGear(new RegexExtract('EXTRAKCE', '/zasto[^\\s]*? (.*?),/', 1));
 $gearbox->addGear(new RegexMatch('MA_ADVOKATA', '/advokát/'));
+$gearbox->addGear(new RegexMatch('DAVA_SMYSL', '/^(([^\s]+)(\s+|$)){2,7}$/'));
+$gearbox->addGear(new ErrorStater('NEMA_SMYSL', 'NOT MEANINGFUL'));
 $gearbox->addGear(new ErrorStater('NEMA_ADVOKATA', 'NO ADVOCATE'));
 $gearbox->addGear(new ErrorStater('FAILED_DOVOLANI_ZALOBCE', 'FAILED_DOVOLANI_ZALOBCE'));
 $gearbox->addGear(new ErrorStater('FAILED_DOVOLANI_NAVRHOVATEL', 'FAILED_DOVOLANI_NAVRHOVATEL'));
@@ -54,10 +56,11 @@ $gearbox->addTransition("ROZDELENI_VPRAVO", RegexSplit::FOUND, "EXTRAKCE");
 $gearbox->addTransition("ROZDELENI_VPRAVO", RegexSplit::NOT_FOUND, "FAILED_ROZDELENI_VPRAVO");
 $gearbox->addTransition("ROZDELENI_VLEVO", RegexSplit::FOUND, "EXTRAKCE");
 $gearbox->addTransition("ROZDELENI_VLEVO", RegexSplit::NOT_FOUND, "FAILED_ROZDELENI_VLEVO");
-$gearbox->addTransition("EXTRAKCE", RegexExtract::EXTRACTED, "FINALIZACE");
+$gearbox->addTransition("EXTRAKCE", RegexExtract::EXTRACTED, "DAVA_SMYSL");
 $gearbox->addTransition("EXTRAKCE", RegexExtract::NOT_EXTRACTED, "MA_ADVOKATA");
+$gearbox->addTransition("DAVA_SMYSL", RegexMatch::MATCHED, "FINALIZACE");
+$gearbox->addTransition("DAVA_SMYSL", RegexMatch::NOT_MATCHED, "NEMA_SMYSL");
 $gearbox->addTransition("MA_ADVOKATA", RegexMatch::NOT_MATCHED, "NEMA_ADVOKATA");
-$gearbox->addTransition("NEMA_ADVOKATA", ErrorStater::DONE, "FINALIZACE");
 
 
 // Content transformer for obtaining registry mark
